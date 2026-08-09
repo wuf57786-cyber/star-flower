@@ -91,28 +91,28 @@
 
                 } else if (mode === 'photo') {
                     if (isMouseDown) {
-                        // 【方案C：长按触发台风失重散开与无规则乱飞】
+                        // 【按下鼠标时】：粒子彻底打散，向四周无规则爆开并失重乱飞
                         let pScreenX = this.x + width / 2;
                         let pScreenY = this.y + height / 2;
                         let disX = pScreenX - mouseX;
                         let disY = pScreenY - mouseY;
                         let distance = Math.sqrt(disX * disX + disY * disY);
 
-                        // 强烈的向外排斥力 + 随机无规则扰动
-                        let pushForce = 45;
-                        let ax = (disX / (distance + 1)) * pushForce + (Math.random() - 0.5) * 15;
-                        let ay = (disY / (distance + 1)) * pushForce + (Math.random() - 0.5) * 15;
-                        let az = (Math.random() - 0.5) * 20;
+                        let pushForce = 35;
+                        let ax = (disX / (distance + 1)) * pushForce + (Math.random() - 0.5) * 20;
+                        let ay = (disY / (distance + 1)) * pushForce + (Math.random() - 0.5) * 20;
+                        let az = (Math.random() - 0.5) * 25;
 
-                        this.vx = (this.vx + ax) * 0.92;
-                        this.vy = (this.vy + ay) * 0.92;
-                        this.vz = (this.vz + az) * 0.92;
+                        this.vx = (this.vx + ax) * 0.90;
+                        this.vy = (this.vy + ay) * 0.90;
+                        this.vz = (this.vz + az) * 0.90;
 
                         this.x += this.vx;
                         this.y += this.vy;
                         this.z += this.vz;
                         return;
                     } else {
+                        // 【松开鼠标时】：慢慢组合，温柔优雅地吸附回归原位
                         let waveX = this.photoX + Math.sin(time * 0.002 + this.photoY * 0.05) * 2;
                         let waveY = this.photoY + Math.cos(time * 0.002 + this.photoX * 0.05) * 2;
                         let waveZ = this.photoZ + Math.sin(time * 0.003) * 3;
@@ -125,12 +125,12 @@
                         let dy = targetY - this.y;
                         let dz = targetZ - this.z;
 
-                        // 松手瞬间给予超强的向心吸附恢复加速度（“咻”的一声瞬间复原）
-                        let ax = dx * 0.18; 
-                        let ay = dy * 0.18;
-                        let az = dz * 0.18;
+                        // 柔和的吸引加速度（让它们慢慢组合）
+                        let ax = dx * 0.045; 
+                        let ay = dy * 0.045;
+                        let az = dz * 0.045;
 
-                        // 星系引力旋涡互动（保持不变）
+                        // 平时日常的鼠标移动星系旋涡互动
                         if (hasMouse) {
                             let pScreenX = this.x + width / 2;
                             let pScreenY = this.y + height / 2;
@@ -138,18 +138,18 @@
                             let disY = mouseY - pScreenY;
                             let distance = Math.sqrt(disX * disX + disY * disY);
 
-                            let pullRadius = 140; 
+                            let pullRadius = 130; 
                             if (distance < pullRadius && distance > 2) {
                                 let force = (1 - distance / pullRadius);
-                                ax += (disX / distance) * force * 4.5 - (disY / distance) * force * 6.0;
-                                ay += (disY / distance) * force * 4.5 + (disX / distance) * force * 6.0;
-                                az += force * 15;
+                                ax += (disX / distance) * force * 3.5 - (disY / distance) * force * 5.0;
+                                ay += (disY / distance) * force * 3.5 + (disX / distance) * force * 5.0;
+                                az += force * 10;
                             }
                         }
 
-                        this.vx = (this.vx + ax) * 0.75;
-                        this.vy = (this.vy + ay) * 0.75;
-                        this.vz = (this.vz + az) * 0.75;
+                        this.vx = (this.vx + ax) * 0.82;
+                        this.vy = (this.vy + ay) * 0.82;
+                        this.vz = (this.vz + az) * 0.82;
 
                         this.x += this.vx;
                         this.y += this.vy;
@@ -181,7 +181,7 @@
                 let py = this.y * scale + height / 2;
 
                 if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.5 : this.size;
+                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.4 : this.size;
                     
                     ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
                     ctx.beginPath();
@@ -279,18 +279,6 @@
                 flowerAngle += 0.01; 
             }
 
-            // 长按时渲染炫酷的冲击波背景光效
-            if (mode === 'photo' && isMouseDown) {
-                let grad = ctx.createRadialGradient(mouseX, mouseY, 5, mouseX, mouseY, 250);
-                grad.addColorStop(0, 'rgba(255, 100, 150, 0.3)');
-                grad.addColorStop(0.5, 'rgba(100, 150, 255, 0.15)');
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(mouseX, mouseY, 250, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
             particles.forEach(p => {
                 p.update(time);
                 p.draw();
@@ -306,7 +294,7 @@
                 const tip = document.getElementById('tip');
                 tip.style.opacity = '0';
                 setTimeout(() => {
-                    tip.innerText = '✨ 移近形成星系旋涡 · 长按触发“台风失重散开” ✨';
+                    tip.innerText = '✨ 按下鼠标打散粒子，松开鼠标缓慢组合成画 ✨';
                     tip.style.opacity = '1';
                 }, 400);
             }
