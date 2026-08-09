@@ -26,19 +26,19 @@
             bottom: 30px;
             width: 100%;
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.75);
             font-size: 14px;
             pointer-events: none;
             letter-spacing: 2px;
             transition: opacity 0.3s;
-            text-shadow: 0 0 12px rgba(255, 120, 180, 0.8);
+            text-shadow: 0 0 12px rgba(255, 100, 180, 0.9);
         }
     </style>
 </head>
 <body>
 
     <canvas id="canvas"></canvas>
-    <div id="tip">✨ 点击屏幕，见证星光绽放成画 ✨</div>
+    <div id="tip">✨ 点击屏幕，3D立体玫瑰绽放成专属画作 ✨</div>
 
     <script>
         const canvas = document.getElementById('canvas');
@@ -83,12 +83,12 @@
                 let targetX = 0, targetY = 0, targetZ = 0;
 
                 if (mode === 'flower') {
-                    // 让立体花束在开局时拥有高级的3D旋转与轻微呼吸浮动
+                    // 3D玫瑰花多维旋转与呼吸起伏
                     let cos = Math.cos(flowerAngle);
                     let sin = Math.sin(flowerAngle);
                     targetX = this.flowerX * cos + this.flowerZ * sin;
                     targetZ = -this.flowerX * sin + this.flowerZ * cos;
-                    targetY = this.flowerY + Math.sin(time * 0.003 + this.flowerX * 0.03) * 5; 
+                    targetY = this.flowerY + Math.sin(time * 0.0025 + this.flowerX * 0.02) * 6; 
 
                 } else if (mode === 'photo') {
                     if (isMouseDown) {
@@ -190,49 +190,36 @@
             }
         }
 
-        // 【高大上炫酷版：3D多层玫瑰花束结构生成算法】
+        // 【终极视觉版：3D立体盛开玫瑰花与枝叶矩阵生成算法】
         function createBouquetParticles(photoParticles) {
             let total = photoParticles.length;
             for (let i = 0; i < total; i++) {
                 let fx, fy, fz, rCol, gCol, bCol;
                 let ratio = i / total;
 
-                if (ratio < 0.65) {
-                    // 核心花朵区：采用多层螺旋玫瑰花瓣几何方程，呈现立体花瓣层次感
-                    let phi = Math.acos(1 - 2 * (i / (total * 0.65)));
-                    let theta = Math.sqrt((total * 0.65) * Math.PI) * phi * 1.5;
-                    let r = 140 * Math.pow(i / (total * 0.65), 0.6);
-
-                    fx = r * Math.sin(phi) * Math.cos(theta);
-                    fy = r * Math.cos(phi) - 40 + Math.sin(theta * 2) * 15; // 制造花瓣起伏
-                    fz = r * Math.sin(phi) * Math.sin(theta);
-
-                    // 绚丽浪漫的渐变配色（粉钻、香槟金与微光紫罗兰）
-                    rCol = Math.floor(220 + Math.random() * 35);
-                    gCol = Math.floor(100 + Math.random() * 90);
-                    bCol = Math.floor(160 + Math.random() * 95);
-                } else if (ratio < 0.85) {
-                    // 花托与绿叶衬托层
-                    let t = (ratio - 0.65) / 0.2;
-                    let angle = t * Math.PI * 6;
-                    let r = t * 90 + 20;
-                    fx = r * Math.cos(angle);
-                    fy = 60 + t * 40;
-                    fz = r * Math.sin(angle);
-
-                    rCol = Math.floor(120 + Math.random() * 60);
-                    gCol = Math.floor(180 + Math.random() * 70);
-                    bCol = Math.floor(140 + Math.random() * 60);
+                if (ratio < 0.60) {
+                    // 核心：3D多层玫瑰花瓣（立体花苞外扩结构）
+                    let u = (i / (total * 0.60)) * Math.PI * 12;
+                    let v = Math.random() * Math.PI * 0.5;
+                    let r = 130 * Math.pow(i / (total * 0.60), 0.5);
+                    
+                    fx = r * Math.sin(v) * Math.cos(u) + Math.sin(u * 2) * 15;
+                    fy = r * Math.cos(v) - 50 + Math.cos(u) * 20;
+                    fz = r * Math.sin(v) * Math.sin(u) + Math.cos(v * 2) * 15;
+                } else if (ratio < 0.80) {
+                    // 中层：向外绽放的大型外层花瓣及花托
+                    let t = (ratio - 0.60) / 0.20;
+                    let angle = t * Math.PI * 8;
+                    let radius = t * 110 + 30;
+                    fx = radius * Math.cos(angle);
+                    fy = 20 + t * 40 + Math.sin(angle * 3) * 10;
+                    fz = radius * Math.sin(angle);
                 } else {
-                    // 优美的流畅花茎与束缚缎带
-                    let t = (ratio - 0.85) / 0.15;
-                    fx = Math.sin(t * Math.PI * 2) * (15 * (1 - t));
-                    fy = 100 + t * 160; 
-                    fz = Math.cos(t * Math.PI * 2) * (15 * (1 - t));
-
-                    rCol = Math.floor(200 + Math.random() * 55);
-                    gCol = Math.floor(170 + Math.random() * 60);
-                    bCol = Math.floor(150 + Math.random() * 50);
+                    // 底座与纤细下垂的花茎、绿叶
+                    let t = (ratio - 0.80) / 0.20;
+                    fx = Math.sin(t * Math.PI * 4) * (20 * (1 - t));
+                    fy = 80 + t * 180; 
+                    fz = Math.cos(t * Math.PI * 4) * (20 * (1 - t));
                 }
 
                 photoParticles[i].flowerX = fx;
@@ -288,7 +275,7 @@
             ctx.fillRect(0, 0, width, height);
 
             if (mode === 'flower') {
-                flowerAngle += 0.008; // 优雅的旋转速度
+                flowerAngle += 0.007; // 优美的3D旋转
             }
 
             particles.forEach(p => {
@@ -306,7 +293,7 @@
                 const tip = document.getElementById('tip');
                 tip.style.opacity = '0';
                 setTimeout(() => {
-                    tip.innerText = '✨ 按下鼠标打散粒子，松开鼠标缓慢组合成画 ✨';
+                    tip.innerText = '✨ 点击操作 ✨';
                     tip.style.opacity = '1';
                 }, 400);
             }
