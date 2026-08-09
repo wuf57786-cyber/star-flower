@@ -91,21 +91,22 @@
 
                 } else if (mode === 'photo') {
                     if (isMouseDown) {
-                        // 长按超级黑洞特效
+                        // 【方案C：长按触发台风失重散开与无规则乱飞】
                         let pScreenX = this.x + width / 2;
                         let pScreenY = this.y + height / 2;
-                        let disX = mouseX - pScreenX;
-                        let disY = mouseY - pScreenY;
+                        let disX = pScreenX - mouseX;
+                        let disY = pScreenY - mouseY;
                         let distance = Math.sqrt(disX * disX + disY * disY);
 
-                        let pullForce = 35;
-                        let ax = (disX / (distance + 1)) * pullForce - (disY / (distance + 1)) * 5;
-                        let ay = (disY / (distance + 1)) * pullForce + (disX / (distance + 1)) * 5;
-                        let az = -5;
+                        // 强烈的向外排斥力 + 随机无规则扰动
+                        let pushForce = 45;
+                        let ax = (disX / (distance + 1)) * pushForce + (Math.random() - 0.5) * 15;
+                        let ay = (disY / (distance + 1)) * pushForce + (Math.random() - 0.5) * 15;
+                        let az = (Math.random() - 0.5) * 20;
 
-                        this.vx = (this.vx + ax) * 0.88;
-                        this.vy = (this.vy + ay) * 0.88;
-                        this.vz = (this.vz + az) * 0.88;
+                        this.vx = (this.vx + ax) * 0.92;
+                        this.vy = (this.vy + ay) * 0.92;
+                        this.vz = (this.vz + az) * 0.92;
 
                         this.x += this.vx;
                         this.y += this.vy;
@@ -124,11 +125,12 @@
                         let dy = targetY - this.y;
                         let dz = targetZ - this.z;
 
-                        let ax = dx * 0.06; 
-                        let ay = dy * 0.06;
-                        let az = dz * 0.06;
+                        // 松手瞬间给予超强的向心吸附恢复加速度（“咻”的一声瞬间复原）
+                        let ax = dx * 0.18; 
+                        let ay = dy * 0.18;
+                        let az = dz * 0.18;
 
-                        // 【方案二：星系引力旋涡互动】
+                        // 星系引力旋涡互动（保持不变）
                         if (hasMouse) {
                             let pScreenX = this.x + width / 2;
                             let pScreenY = this.y + height / 2;
@@ -136,19 +138,18 @@
                             let disY = mouseY - pScreenY;
                             let distance = Math.sqrt(disX * disX + disY * disY);
 
-                            let pullRadius = 140; // 影响半径
+                            let pullRadius = 140; 
                             if (distance < pullRadius && distance > 2) {
                                 let force = (1 - distance / pullRadius);
-                                // 向心吸引力 + 切线方向旋转力（形成漩涡公转）
                                 ax += (disX / distance) * force * 4.5 - (disY / distance) * force * 6.0;
                                 ay += (disY / distance) * force * 4.5 + (disX / distance) * force * 6.0;
                                 az += force * 15;
                             }
                         }
 
-                        this.vx = (this.vx + ax) * 0.80;
-                        this.vy = (this.vy + ay) * 0.80;
-                        this.vz = (this.vz + az) * 0.80;
+                        this.vx = (this.vx + ax) * 0.75;
+                        this.vy = (this.vy + ay) * 0.75;
+                        this.vz = (this.vz + az) * 0.75;
 
                         this.x += this.vx;
                         this.y += this.vy;
@@ -180,7 +181,7 @@
                 let py = this.y * scale + height / 2;
 
                 if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.3 : this.size;
+                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.5 : this.size;
                     
                     ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
                     ctx.beginPath();
@@ -278,14 +279,15 @@
                 flowerAngle += 0.01; 
             }
 
+            // 长按时渲染炫酷的冲击波背景光效
             if (mode === 'photo' && isMouseDown) {
-                let grad = ctx.createRadialGradient(mouseX, mouseY, 2, mouseX, mouseY, 150);
-                grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-                grad.addColorStop(0.2, 'rgba(120, 150, 255, 0.4)');
+                let grad = ctx.createRadialGradient(mouseX, mouseY, 5, mouseX, mouseY, 250);
+                grad.addColorStop(0, 'rgba(255, 100, 150, 0.3)');
+                grad.addColorStop(0.5, 'rgba(100, 150, 255, 0.15)');
                 grad.addColorStop(1, 'transparent');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(mouseX, mouseY, 150, 0, Math.PI * 2);
+                ctx.arc(mouseX, mouseY, 250, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -304,7 +306,7 @@
                 const tip = document.getElementById('tip');
                 tip.style.opacity = '0';
                 setTimeout(() => {
-                    tip.innerText = '✨ 鼠标靠近形成星系旋涡 · 长按屏幕触发“超级黑洞” ✨';
+                    tip.innerText = '✨ 移近形成星系旋涡 · 长按触发“台风失重散开” ✨';
                     tip.style.opacity = '1';
                 }, 400);
             }
