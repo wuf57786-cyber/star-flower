@@ -76,7 +76,7 @@
                 this.vy = 0;
                 this.vz = 0;
 
-                this.size = Math.random() * 1.5 + 0.7;
+                this.size = Math.random() * 1.5 + 0.7; // 粒子稍微调大一点点，更有质感
             }
 
             update(time) {
@@ -91,28 +91,26 @@
 
                 } else if (mode === 'photo') {
                     if (isMouseDown) {
-                        // 【按下鼠标时】：粒子彻底打散，向四周无规则爆开并失重乱飞
                         let pScreenX = this.x + width / 2;
                         let pScreenY = this.y + height / 2;
-                        let disX = pScreenX - mouseX;
-                        let disY = pScreenY - mouseY;
+                        let disX = mouseX - pScreenX;
+                        let disY = mouseY - pScreenY;
                         let distance = Math.sqrt(disX * disX + disY * disY);
 
-                        let pushForce = 35;
-                        let ax = (disX / (distance + 1)) * pushForce + (Math.random() - 0.5) * 20;
-                        let ay = (disY / (distance + 1)) * pushForce + (Math.random() - 0.5) * 20;
-                        let az = (Math.random() - 0.5) * 25;
+                        let pullForce = 35;
+                        let ax = (disX / (distance + 1)) * pullForce - (disY / (distance + 1)) * 5;
+                        let ay = (disY / (distance + 1)) * pullForce + (disX / (distance + 1)) * 5;
+                        let az = -5;
 
-                        this.vx = (this.vx + ax) * 0.90;
-                        this.vy = (this.vy + ay) * 0.90;
-                        this.vz = (this.vz + az) * 0.90;
+                        this.vx = (this.vx + ax) * 0.88;
+                        this.vy = (this.vy + ay) * 0.88;
+                        this.vz = (this.vz + az) * 0.88;
 
                         this.x += this.vx;
                         this.y += this.vy;
                         this.z += this.vz;
                         return;
                     } else {
-                        // 【松开鼠标时】：慢慢组合，温柔优雅地吸附回归原位
                         let waveX = this.photoX + Math.sin(time * 0.002 + this.photoY * 0.05) * 2;
                         let waveY = this.photoY + Math.cos(time * 0.002 + this.photoX * 0.05) * 2;
                         let waveZ = this.photoZ + Math.sin(time * 0.003) * 3;
@@ -125,12 +123,10 @@
                         let dy = targetY - this.y;
                         let dz = targetZ - this.z;
 
-                        // 柔和的吸引加速度（让它们慢慢组合）
-                        let ax = dx * 0.045; 
-                        let ay = dy * 0.045;
-                        let az = dz * 0.045;
+                        let ax = dx * 0.06; 
+                        let ay = dy * 0.06;
+                        let az = dz * 0.06;
 
-                        // 平时日常的鼠标移动星系旋涡互动
                         if (hasMouse) {
                             let pScreenX = this.x + width / 2;
                             let pScreenY = this.y + height / 2;
@@ -138,18 +134,17 @@
                             let disY = mouseY - pScreenY;
                             let distance = Math.sqrt(disX * disX + disY * disY);
 
-                            let pullRadius = 130; 
+                            let pullRadius = 95; 
                             if (distance < pullRadius && distance > 2) {
-                                let force = (1 - distance / pullRadius);
-                                ax += (disX / distance) * force * 3.5 - (disY / distance) * force * 5.0;
-                                ay += (disY / distance) * force * 3.5 + (disX / distance) * force * 5.0;
-                                az += force * 10;
+                                let force = (1 - distance / pullRadius) * 12;
+                                ax += (disX / distance) * force * 2.5 - (disY / distance) * force * 1.5;
+                                ay += (disY / distance) * force * 2.5 + (disX / distance) * force * 1.5;
                             }
                         }
 
-                        this.vx = (this.vx + ax) * 0.82;
-                        this.vy = (this.vy + ay) * 0.82;
-                        this.vz = (this.vz + az) * 0.82;
+                        this.vx = (this.vx + ax) * 0.80;
+                        this.vy = (this.vy + ay) * 0.80;
+                        this.vz = (this.vz + az) * 0.80;
 
                         this.x += this.vx;
                         this.y += this.vy;
@@ -181,7 +176,7 @@
                 let py = this.y * scale + height / 2;
 
                 if (px >= 0 && px <= width && py >= 0 && py <= height) {
-                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.4 : this.size;
+                    let currentSize = (isMouseDown && mode === 'photo') ? this.size * 1.3 : this.size;
                     
                     ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
                     ctx.beginPath();
@@ -198,6 +193,7 @@
                 
                 let ratio = i / total;
                 if (ratio < 0.75) {
+                    // 【上方：加大花头区半径（从110放大到160）】
                     let u = Math.random();
                     let v = Math.random();
                     let theta = u * 2.0 * Math.PI;
@@ -212,6 +208,7 @@
                     gCol = Math.floor(120 + Math.random() * 80);
                     bCol = Math.floor(150 + Math.random() * 80);
                 } else {
+                    // 【下方：根茎与枝干区同步放大】
                     let t = (ratio - 0.75) / 0.25;
                     fx = (Math.random() - 0.5) * (t * 80 + 15);
                     fy = 80 + t * 140; 
@@ -236,6 +233,7 @@
             const tempCanvas = document.createElement('canvas');
             const tCtx = tempCanvas.getContext('2d');
             
+            // 【照片尺寸放大：从520放大到720】
             let maxDim = 720; 
             let scale = Math.min(maxDim / img.width, maxDim / img.height);
             let w = Math.floor(img.width * scale);
@@ -279,6 +277,17 @@
                 flowerAngle += 0.01; 
             }
 
+            if (mode === 'photo' && isMouseDown) {
+                let grad = ctx.createRadialGradient(mouseX, mouseY, 2, mouseX, mouseY, 150);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                grad.addColorStop(0.2, 'rgba(120, 150, 255, 0.4)');
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 150, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
             particles.forEach(p => {
                 p.update(time);
                 p.draw();
@@ -294,7 +303,7 @@
                 const tip = document.getElementById('tip');
                 tip.style.opacity = '0';
                 setTimeout(() => {
-                    tip.innerText = '✨ 按下鼠标打散粒子，松开鼠标缓慢组合成画 ✨';
+                    tip.innerText = '✨ 鼠标靠近局部互动 · 长按屏幕触发“超级黑洞” ✨';
                     tip.style.opacity = '1';
                 }, 400);
             }
