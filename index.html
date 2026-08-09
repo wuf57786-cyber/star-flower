@@ -76,7 +76,7 @@
                 this.vy = 0;
                 this.vz = 0;
 
-                this.size = Math.random() * 1.5 + 0.7; // 粒子稍微调大一点点，更有质感
+                this.size = Math.random() * 1.5 + 0.7;
             }
 
             update(time) {
@@ -91,6 +91,7 @@
 
                 } else if (mode === 'photo') {
                     if (isMouseDown) {
+                        // 长按超级黑洞特效
                         let pScreenX = this.x + width / 2;
                         let pScreenY = this.y + height / 2;
                         let disX = mouseX - pScreenX;
@@ -127,6 +128,7 @@
                         let ay = dy * 0.06;
                         let az = dz * 0.06;
 
+                        // 【方案二：星系引力旋涡互动】
                         if (hasMouse) {
                             let pScreenX = this.x + width / 2;
                             let pScreenY = this.y + height / 2;
@@ -134,11 +136,13 @@
                             let disY = mouseY - pScreenY;
                             let distance = Math.sqrt(disX * disX + disY * disY);
 
-                            let pullRadius = 95; 
+                            let pullRadius = 140; // 影响半径
                             if (distance < pullRadius && distance > 2) {
-                                let force = (1 - distance / pullRadius) * 12;
-                                ax += (disX / distance) * force * 2.5 - (disY / distance) * force * 1.5;
-                                ay += (disY / distance) * force * 2.5 + (disX / distance) * force * 1.5;
+                                let force = (1 - distance / pullRadius);
+                                // 向心吸引力 + 切线方向旋转力（形成漩涡公转）
+                                ax += (disX / distance) * force * 4.5 - (disY / distance) * force * 6.0;
+                                ay += (disY / distance) * force * 4.5 + (disX / distance) * force * 6.0;
+                                az += force * 15;
                             }
                         }
 
@@ -193,7 +197,6 @@
                 
                 let ratio = i / total;
                 if (ratio < 0.75) {
-                    // 【上方：加大花头区半径（从110放大到160）】
                     let u = Math.random();
                     let v = Math.random();
                     let theta = u * 2.0 * Math.PI;
@@ -208,7 +211,6 @@
                     gCol = Math.floor(120 + Math.random() * 80);
                     bCol = Math.floor(150 + Math.random() * 80);
                 } else {
-                    // 【下方：根茎与枝干区同步放大】
                     let t = (ratio - 0.75) / 0.25;
                     fx = (Math.random() - 0.5) * (t * 80 + 15);
                     fy = 80 + t * 140; 
@@ -233,7 +235,6 @@
             const tempCanvas = document.createElement('canvas');
             const tCtx = tempCanvas.getContext('2d');
             
-            // 【照片尺寸放大：从520放大到720】
             let maxDim = 720; 
             let scale = Math.min(maxDim / img.width, maxDim / img.height);
             let w = Math.floor(img.width * scale);
@@ -303,7 +304,7 @@
                 const tip = document.getElementById('tip');
                 tip.style.opacity = '0';
                 setTimeout(() => {
-                    tip.innerText = '✨ 鼠标靠近局部互动 · 长按屏幕触发“超级黑洞” ✨';
+                    tip.innerText = '✨ 鼠标靠近形成星系旋涡 · 长按屏幕触发“超级黑洞” ✨';
                     tip.style.opacity = '1';
                 }, 400);
             }
